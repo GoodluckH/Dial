@@ -1,8 +1,12 @@
-import logo from './logo.svg';
 import './App.css';
 import React, { useEffect, useState } from 'react';
 import sampleABI from './abi';
 import ContractFunctions from './components/ContractFunctions';
+import SearchBar from './components/SearchBar';
+import { VStack, Container } from '@chakra-ui/react'
+
+
+
 
 const ETHERSCAN_API = process.env.REACT_APP_ETHERSCAN_API
 //const etherScanAPIEndPoint = `https://api.etherscan.io/api?module=contract&action=getabi&address=0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413&apikey=${ETHERSCAN_API}`
@@ -28,6 +32,15 @@ function App() {
     .then(res => res.json())
     .then(
       (result) => {
+        if (!result.hasOwnProperty('result)) {
+          //TODO: something wrong with the API 
+          return;
+        }
+        if (result.status === "0" && result.result === "Contract source code not verified" ) {
+          //TODO: display the error result
+          return;
+        }
+
         var contractABI = sampleABI;
        // contractABI = result.result;
         if (contractABI !== ''){
@@ -36,7 +49,8 @@ function App() {
           setContractABI(contractABI);
           setContractItems(contractABIParsed);
       } else {
-          console.log("Error" );
+        //TODO: display unable to extract functions
+          console.log("Error");
       } 
       },
       (error) => {
@@ -49,7 +63,13 @@ function App() {
 
   return (
     <div className="App">
-      <ContractFunctions ABI={sampleABI} />
+      <VStack>
+      <Container maxW='md'>
+        <SearchBar />
+        <ContractFunctions ABI={sampleABI} /> 
+      </Container>
+      </VStack>
+
     </div>
   );
 }
