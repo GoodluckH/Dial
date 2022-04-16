@@ -23,12 +23,6 @@ function SearchBar(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateAddress()) {
-      console.log("hello");
-      console.log(
-        `https://api.etherscan.io/api?module=contract&action=getabi&address=${
-          address.length === 40 ? "0x" + address : address
-        }&apikey=${process.env.REACT_APP_ETHERSCAN_API}`
-      );
       setLoading(true);
       return fetch(
         `https://api.etherscan.io/api?module=contract&action=getabi&address=${
@@ -55,9 +49,8 @@ function SearchBar(props) {
 
             var contractABI = result.result;
             if (contractABI !== "") {
-              let contractABIParsed = JSON.parse(contractABI);
-              // console.log(contractABI);
-              props.onGettingContractABI(contractABI, contractABIParsed);
+              if (address.length === 40) setAddress("0x" + address);
+              props.onGettingContractABI(contractABI, address);
             } else {
               //TODO: display unable to extract functions
               console.log("Error");
@@ -104,6 +97,7 @@ function SearchBar(props) {
             icon={<SearchIcon />}
             type="submit"
             onClick={handleSubmit}
+            isLoading={loading}
           />
         </HStack>
       </form>
