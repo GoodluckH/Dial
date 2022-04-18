@@ -1,5 +1,6 @@
 import React from "react";
-import { Text } from "@chakra-ui/react";
+import { Text, Tooltip } from "@chakra-ui/react";
+import { QuestionIcon, Icon } from "@chakra-ui/icons";
 import FunctionButton from "./FunctionButton";
 
 function GetterFunctions({ functions, ABI, contractAddress }) {
@@ -7,7 +8,13 @@ function GetterFunctions({ functions, ABI, contractAddress }) {
   return (
     <>
       <Text fontWeight="bold" fontSize="lg">
-        👀 Getter Functions
+        👀 Getter Functions{" "}
+        <Tooltip
+          fontSize="sm"
+          label='Smart Contract functions that are read-only (marked as "view" or "pure"). Calling these functions does not cost gas 🥳'
+        >
+          <Icon as={QuestionIcon} w={4} h={4} color="gray.500" />
+        </Tooltip>
       </Text>
       {functions.map((item, i) => {
         return (

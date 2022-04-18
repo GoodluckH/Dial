@@ -4,15 +4,14 @@ import "./index.css";
 import App from "./App";
 import { ChakraProvider } from "@chakra-ui/react";
 // import reportWebVitals from './reportWebVitals';
-import { ThirdwebProvider } from "@thirdweb-dev/react";
+import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
 
 const root = createRoot(document.getElementById("root"));
-const desiredChainId = 1;
 
 root.render(
   <StrictMode>
     <ChakraProvider>
-      <ThirdwebProvider desiredChainId={desiredChainId}>
+      <ThirdwebProvider desiredChainId={ChainId.Mainnet}>
         <App />
       </ThirdwebProvider>
     </ChakraProvider>

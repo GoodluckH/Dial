@@ -1,3 +1,4 @@
+import { Box, Button, Image, Spacer, Text, VStack } from "@chakra-ui/react";
 import {
   useMetamask,
   useWalletConnect,
@@ -6,6 +7,7 @@ import {
   useAddress,
   useDisconnect,
 } from "@thirdweb-dev/react";
+import WalletButton from "./WalletButton";
 
 export const ConnectWallet = () => {
   const connectWithCoinbaseWallet = useCoinbaseWallet();
@@ -30,14 +32,41 @@ export const ConnectWallet = () => {
 
   // If no wallet is connected, show connect wallet options
   return (
-    <div>
-      <button onClick={() => connectWithCoinbaseWallet()}>
-        Connect Coinbase Wallet
-      </button>
-      <button onClick={() => connectWithMetamask()}>Connect MetaMask</button>
-      <button onClick={() => connectWithWalletConnect()}>
-        Connect WalletConnect
-      </button>
-    </div>
+    <Box
+      maxW="lg"
+      borderWidth="2px"
+      borderRadius="25"
+      overflow="hidden"
+      boxShadow="md"
+      minH="200px"
+      padding="30px"
+      background="white"
+    >
+      <VStack>
+        <Text fontSize="xl" fontWeight="black">
+          Connect your wallet to get started!
+        </Text>
+        <Spacer />
+        <Button
+          width="85%"
+          minH="60px"
+          onClick={() => connectWithCoinbaseWallet()}
+          justifyContent="flex-start"
+        >
+          <WalletButton wallet="Coinbase" />
+        </Button>
+
+        <Button width="85%" minH="60px" onClick={() => connectWithMetamask()}>
+          <WalletButton wallet="MetaMask" />
+        </Button>
+        <Button
+          width="85%"
+          minH="60px"
+          onClick={() => connectWithWalletConnect()}
+        >
+          <WalletButton wallet="WalletConnect" />
+        </Button>
+      </VStack>
+    </Box>
   );
 };

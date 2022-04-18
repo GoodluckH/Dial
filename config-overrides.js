@@ -13,13 +13,17 @@ module.exports = function override(config, env) {
       buffer: require.resolve("buffer"),
       stream: require.resolve("stream-browserify"),
       assert: require.resolve("assert"),
+      process: require.resolve("process"),
     },
-    extensions: ["*", ".mjs", ".js", ".jsx", ".ts", ".tsx"],
+    alias: {
+      process: "process/browser",
+      util: "util",
+    },
   };
 
   config.plugins.push(
     new webpack.ProvidePlugin({
-      sprocess: "process/browser",
+      process: "process/browser",
       Buffer: ["buffer", "Buffer"],
     })
   );

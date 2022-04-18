@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useToast,
   Input,
@@ -6,15 +6,32 @@ import {
   IconButton,
   FormControl,
 } from "@chakra-ui/react";
+import { useNetwork } from "@thirdweb-dev/react";
 import { SearchIcon } from "@chakra-ui/icons";
 import Web3 from "web3/dist/web3.min.js";
 const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+
+function getEtherScanAPI(address, network) {
+  var endpoint = "";
+  if (network[0].data.chain && network[0].data.chain.id === 4) {
+    endpoint = `https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${
+      address.length === 40 ? "0x" + address : address
+    }&apikey=${process.env.REACT_APP_ETHERSCAN_API}`;
+  } else if (network[0].data.chain && network[0].data.chain.id === 1) {
+    endpoint = `https://api.etherscan.io/api?module=contract&action=getabi&address=${
+      address.length === 40 ? "0x" + address : address
+    }&apikey=${process.env.REACT_APP_ETHERSCAN_API}`;
+  }
+  console.log("switched to " + network[0].data.chain.id);
+  return endpoint;
+}
 
 function SearchBar(props) {
   const toast = useToast();
   const placeholderText = "address of a verified cotract";
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
+  const currentNetwork = useNetwork();
 
   const handleInput = (e) => {
     setAddress(e.target.value);
@@ -24,11 +41,7 @@ function SearchBar(props) {
     e.preventDefault();
     if (validateAddress()) {
       setLoading(true);
-      return fetch(
-        `https://api.etherscan.io/api?module=contract&action=getabi&address=${
-          address.length === 40 ? "0x" + address : address
-        }&apikey=${process.env.REACT_APP_ETHERSCAN_API}`
-      )
+      return fetch(getEtherScanAPI(address, currentNetwork))
         .then((res) => res.json())
         .then(
           (result) => {
@@ -83,7 +96,7 @@ function SearchBar(props) {
   };
 
   return (
-    <FormControl>
+    <FormControl marginBottom="25px">
       <form>
         <HStack>
           <Input
