@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Text, HStack, Button, useToast, Spacer } from "@chakra-ui/react";
+import { Text, HStack, Button, useToast, Spacer, Box } from "@chakra-ui/react";
 import process from "process";
 import { ethers } from "ethers";
 import formatResonse from "../helpers/formatResponse";
-import TypeTag from "./TypeTag";
+import TypeTags from "./TypeTags";
 window.process = process;
 
-function FunctionButton({ func, ABI, contractAddress }) {
+function FunctionButton({ func, ABI, contractAddress, isGetter }) {
   const toast = useToast();
 
   const [loading, setLoading] = useState(false);
@@ -27,9 +27,9 @@ function FunctionButton({ func, ABI, contractAddress }) {
         setResponse(formatResonse(value));
       },
       (error) => {
-        // const errorJSON = JSON.stringify(error);
-        // const parsedError = JSON.parse(errorJSON);
-        // console.log(parsedError);
+        const errorJSON = JSON.stringify(error);
+        const parsedError = JSON.parse(errorJSON);
+        console.log(parsedError);
 
         toast({
           id: "genericError",
@@ -46,27 +46,33 @@ function FunctionButton({ func, ABI, contractAddress }) {
     setLoading(false);
   };
 
-  if (func.hasOwnProperty("inputs") && func.inputs.length === 0) {
+  if (isGetter) {
     return (
       <>
         <Button
           justifyContent="space-between"
           isLoading={loading}
           size="md"
-          height="45px"
-          width="85%"
-          border="20px"
+          height="50px"
+          width="100%"
+          borderRadius="10"
           borderColor="gray.100"
           bg="gray.100"
-          shadow="md"
+          shadow="base"
           onClick={callGetterFunction}
         >
           <Text>{func.name}</Text>
-          <TypeTag type={func.outputs[0].type} />
+          <HStack>
+            {func.outputs.length !== 0 && <TypeTags outputs={func.outputs} />}
+          </HStack>
         </Button>
         {response.length !== 0 &&
           response.map((value, i) => {
-            return <p key={i}>{value}</p>;
+            return (
+              <Text key={i} marginBottom="200px">
+                {value}
+              </Text>
+            );
           })}
       </>
     );

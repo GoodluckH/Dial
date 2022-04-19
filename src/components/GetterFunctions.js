@@ -7,7 +7,7 @@ function GetterFunctions({ functions, ABI, contractAddress }) {
   if (functions.length === 0) return;
   return (
     <>
-      <Text fontWeight="bold" fontSize="lg">
+      <Text fontWeight="bold" fontSize="lg" marginBottom="20px">
         👀 Getter Functions{" "}
         <Tooltip
           fontSize="sm"
@@ -23,6 +23,7 @@ function GetterFunctions({ functions, ABI, contractAddress }) {
             func={item}
             ABI={ABI}
             contractAddress={contractAddress}
+            isGetter={true}
           />
         );
       })}

@@ -9,8 +9,14 @@ function ContractFunctions({ ABI, contractAddress }) {
   var parsed = JSON.parse(ABI);
 
   var functions = parsed.filter((item) => item.type === "function");
-  var getterFunctions = functions.filter((item) => item.inputs.length === 0);
-  var normalFunctions = functions.filter((item) => item.inputs.length !== 0);
+  var getterFunctions = functions.filter(
+    (item) =>
+      item.inputs.length === 0 &&
+      (item.stateMutability === "view" || item.stateMutability === "pure")
+  );
+  var normalFunctions = functions.filter(
+    (item) => item.inputs.length !== 0 || !getterFunctions.includes(item)
+  );
 
   return (
     <VStack>

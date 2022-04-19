@@ -16,6 +16,7 @@ function NormalFunctions({ functions, ABI, contractAddress }) {
             func={item}
             ABI={ABI}
             contractAddress={contractAddress}
+            isGetter={false}
           />
         );
       })}

@@ -1,11 +1,17 @@
 import { Box, Text } from "@chakra-ui/react";
 import React from "react";
 
-function TypeTag({ type }) {
+function TypeTags({ outputs }) {
+  var validOutputs = outputs.filter((item) => item.type !== undefined);
+  var types = validOutputs.map((output) => output.type);
   return (
-    <Box background={getColor(type)} p="2px">
-      <Text fontSize="12px">{type}</Text>
-    </Box>
+    <>
+      {types.map((type, i) => (
+        <Box key={i} background={getColor(type)} p="2px">
+          <Text fontSize="12px">{type}</Text>
+        </Box>
+      ))}
+    </>
   );
 }
 
@@ -22,4 +28,4 @@ function getColor(type) {
   }
 }
 
-export default TypeTag;
+export default TypeTags;
