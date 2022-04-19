@@ -6,8 +6,8 @@ function NormalFunctions({ functions, ABI, contractAddress }) {
   if (functions.length === 0) return;
   return (
     <>
-      <Text fontWeight="bold" fontSize="lg">
-        Normal Functions
+      <Text fontWeight="bold" fontSize="lg" marginBottom="20px">
+        📞 Normal Functions
       </Text>
       {functions.map((item, i) => {
         return (
@@ -16,7 +16,6 @@ function NormalFunctions({ functions, ABI, contractAddress }) {
             func={item}
             ABI={ABI}
             contractAddress={contractAddress}
-            isGetter={false}
           />
         );
       })}

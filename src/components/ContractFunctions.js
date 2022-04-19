@@ -1,5 +1,5 @@
 import React from "react";
-import { VStack } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import GetterFunctions from "./GetterFunctions";
 import NormalFunctions from "./NormalFunctions";
 
@@ -19,18 +19,19 @@ function ContractFunctions({ ABI, contractAddress }) {
   );
 
   return (
-    <VStack>
+    <>
       <GetterFunctions
         functions={getterFunctions}
         ABI={ABI}
         contractAddress={contractAddress}
       />
+      <Box h={12}></Box>
       <NormalFunctions
         functions={normalFunctions}
         ABI={ABI}
         contractAddress={contractAddress}
       />
-    </VStack>
+    </>
   );
 }
 

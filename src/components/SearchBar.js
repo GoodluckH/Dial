@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   useToast,
   Input,
@@ -39,8 +39,9 @@ function SearchBar(props) {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (address.trim() === "") return;
+    setLoading(true);
     if (validateAddress()) {
-      setLoading(true);
       return fetch(getEtherScanAPI(address, currentNetwork))
         .then((res) => res.json())
         .then(
@@ -69,14 +70,15 @@ function SearchBar(props) {
               console.log("Error");
             }
             setLoading(false);
+            return true;
           },
           (error) => {
             console.log("something went wrong: " + error);
             setLoading(false);
+            return false;
           }
         );
-    } else if (address === "") return;
-    else {
+    } else {
       if (!toast.isActive("addressCheck")) {
         toast({
           id: "addressCheck",
@@ -96,7 +98,7 @@ function SearchBar(props) {
   };
 
   return (
-    <FormControl marginBottom="25px">
+    <FormControl marginBottom="25px" textColor="blackAlpha.800">
       <form>
         <HStack>
           <Input
@@ -111,6 +113,7 @@ function SearchBar(props) {
             type="submit"
             onClick={handleSubmit}
             isLoading={loading}
+            background="gray.300"
           />
         </HStack>
       </form>
