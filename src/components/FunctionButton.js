@@ -6,11 +6,14 @@ import {
   useToast,
   useColorModeValue,
   Box,
+  FormControl,
+  Input,
 } from "@chakra-ui/react";
 import process from "process";
 import { ethers } from "ethers";
 import formatResonse from "../helpers/formatResponse";
 import TypeTags from "./TypeTags";
+import getArgumentTypes from "../helpers/getArgumentTypes";
 window.process = process;
 
 function FunctionButton({ func, ABI, contractAddress }) {
@@ -18,17 +21,31 @@ function FunctionButton({ func, ABI, contractAddress }) {
 
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [userInputs, setUserInputs] = useState(new Array(func.inputs.length));
 
   var provider = new ethers.providers.Web3Provider(window.ethereum);
   // const signer = provider.getSigner();
 
   const callGetterFunction = async () => {
+    console.log(userInputs);
     if (response.length !== 0) {
       setResponse([]);
+      setShowForm(false);
       return;
     }
+    if (func.inputs.length !== 0 && !showForm) {
+      setShowForm(true);
+      console.log("hi");
+      return;
+    }
+
+    if (showForm) setShowForm(false);
+    console.log("hi2");
     setLoading(true);
     const contract = new ethers.Contract(contractAddress, ABI, provider);
+    const argumentTypes = getArgumentTypes(func.inputs);
+    console.log(`(${argumentTypes.toString()})`);
     await contract[func.name + "()"]().then(
       (value) => {
         setResponse(formatResonse(value));
@@ -37,30 +54,17 @@ function FunctionButton({ func, ABI, contractAddress }) {
         const errorJSON = JSON.stringify(error);
         const parsedError = JSON.parse(errorJSON);
         console.log(parsedError);
-        if (parsedError.data !== undefined && parsedError.data === "0x") {
-          if (!toast.isActive("isAccount")) {
-            toast({
-              id: "isAccount",
-              title: "Not a Smart Contract",
-              description: `The address you put in is not a Smart Contract; it's likely an account address`,
-              status: "warning",
-              duration: 5000,
-              position: "top",
-              isClosable: true,
-            });
-          }
-        } else {
-          if (!toast.isActive("genericError")) {
-            toast({
-              id: "genericError",
-              title: "Chain Change Detected",
-              description: `Refresh and try again. Make sure your wallet is connected to the correct chain`,
-              status: "warning",
-              duration: 4000,
-              position: "top",
-              isClosable: true,
-            });
-          }
+
+        if (!toast.isActive("generic")) {
+          toast({
+            id: "generic",
+            title: "Something Went Wrong",
+            description: `${parsedError.reason}`,
+            status: "warning",
+            duration: 5000,
+            position: "top",
+            isClosable: true,
+          });
         }
       }
     );
@@ -77,7 +81,7 @@ function FunctionButton({ func, ABI, contractAddress }) {
         height="50px"
         width="100%"
         sx={
-          response.length === 0
+          (response.length === 0) ^ showForm
             ? { borderRadius: "10px" }
             : { borderRadius: "10px 10px 0 0" }
         }
@@ -94,6 +98,39 @@ function FunctionButton({ func, ABI, contractAddress }) {
       </Button>
       <Box
         bg={useColorModeValue("gray.200", "gray.500")}
+        marginTop={-3}
+        borderColor="gray.100"
+        padding={3}
+        marginBottom={3}
+        sx={{ borderRadius: "0 0 10px 10px" }}
+        hidden={!showForm}
+      >
+        {func.inputs.map((arg, i) => (
+          <FormControl isRequired key={i}>
+            <Input
+              marginBottom={2}
+              _light={{ bg: "gray.50" }}
+              _dark={{ bg: "gray.700" }}
+              placeholder={arg.type}
+              onChange={(e) => {
+                userInputs[i] = e.target.value;
+                setUserInputs(userInputs);
+              }}
+            />
+          </FormControl>
+        ))}
+        <Button
+          margin={1}
+          _light={{ bg: "gray.50" }}
+          _dark={{ bg: "gray.600" }}
+          _hover={{ bg: "gray.200" }}
+          onClick={callGetterFunction}
+        >
+          Call
+        </Button>
+      </Box>
+      <Box
+        bg={useColorModeValue("gray.200", "gray.500")}
         height={12}
         marginTop={-3}
         borderColor="gray.100"
@@ -102,10 +139,9 @@ function FunctionButton({ func, ABI, contractAddress }) {
         sx={{ borderRadius: "0 0 10px 10px" }}
         hidden={response.length === 0}
       >
-        {response.length !== 0 &&
-          response.map((value, i) => {
-            return <Text key={i}>{value}</Text>;
-          })}
+        {response.map((value, i) => {
+          return <Text key={i}>{value}</Text>;
+        })}
       </Box>
     </>
   );
