@@ -14,21 +14,23 @@ import { ethers } from "ethers";
 import formatResonse from "../helpers/formatResponse";
 import TypeTags from "./TypeTags";
 import getArgumentTypes from "../helpers/getArgumentTypes";
+import validateForm from "../helpers/validateForm";
 window.process = process;
 
 function FunctionButton({ func, ABI, contractAddress }) {
   const toast = useToast();
-
+  console.log("func inputs length: " + func.inputs.length);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [userInputs, setUserInputs] = useState(new Array(func.inputs.length));
+  const [userInputs, setUserInputs] = useState(
+    func.inputs.length === 0 ? [] : new Array(func.inputs.length)
+  );
 
   var provider = new ethers.providers.Web3Provider(window.ethereum);
   // const signer = provider.getSigner();
 
   const callGetterFunction = async () => {
-    console.log(userInputs);
     if (response.length !== 0) {
       setResponse([]);
       setShowForm(false);
@@ -36,17 +38,21 @@ function FunctionButton({ func, ABI, contractAddress }) {
     }
     if (func.inputs.length !== 0 && !showForm) {
       setShowForm(true);
-      console.log("hi");
       return;
     }
 
-    if (showForm) setShowForm(false);
-    console.log("hi2");
+    if (showForm) {
+      if (true) {
+        setShowForm(false);
+      } else return;
+    }
     setLoading(true);
     const contract = new ethers.Contract(contractAddress, ABI, provider);
     const argumentTypes = getArgumentTypes(func.inputs);
-    console.log(`(${argumentTypes.toString()})`);
-    await contract[func.name + "()"]().then(
+    console.log(userInputs);
+    await contract[func.name + `(${argumentTypes.toString()})`](
+      ...userInputs
+    ).then(
       (value) => {
         setResponse(formatResonse(value));
       },
@@ -111,7 +117,7 @@ function FunctionButton({ func, ABI, contractAddress }) {
               marginBottom={2}
               _light={{ bg: "gray.50" }}
               _dark={{ bg: "gray.700" }}
-              placeholder={arg.type}
+              placeholder={`${arg.name} (${arg.type})`}
               onChange={(e) => {
                 userInputs[i] = e.target.value;
                 setUserInputs(userInputs);
