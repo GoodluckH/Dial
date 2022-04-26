@@ -7,6 +7,7 @@ import {
   Box,
   Spacer,
   useColorModeValue,
+  Text,
 } from "@chakra-ui/react";
 import { ConnectWallet } from "./components/ConnectWallet";
 import { useAddress } from "@thirdweb-dev/react";
@@ -41,12 +42,13 @@ function App() {
             borderColor={useColorModeValue("gray.200", "gray.900")}
             overflow="hidden"
             boxShadow="md"
-            minH="200px"
+            minH="10px"
             background={useColorModeValue("white", "gray.800")}
             padding="25px"
             marginTop={69}
           >
             <SearchBar onGettingContractABI={updateContract} />
+
             <ContractFunctions
               ABI={contractABI}
               contractAddress={contractAddress}

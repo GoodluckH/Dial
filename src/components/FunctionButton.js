@@ -17,9 +17,8 @@ import getArgumentTypes from "../helpers/getArgumentTypes";
 import validateForm from "../helpers/validateForm";
 window.process = process;
 
-function FunctionButton({ func, ABI, contractAddress }) {
+function FunctionButton({ func, ABI, contractAddress, isGetter }) {
   const toast = useToast();
-  console.log("func inputs length: " + func.inputs.length);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -28,7 +27,16 @@ function FunctionButton({ func, ABI, contractAddress }) {
   );
 
   var provider = new ethers.providers.Web3Provider(window.ethereum);
-  // const signer = provider.getSigner();
+  const signer = provider.getSigner();
+
+  const openOrCollapse = () => {
+    if (response.length !== 0) {
+      setResponse([]);
+      setShowForm(false);
+    } else {
+      setShowForm(!showForm);
+    }
+  };
 
   const callGetterFunction = async () => {
     if (response.length !== 0) {
@@ -41,20 +49,25 @@ function FunctionButton({ func, ABI, contractAddress }) {
       return;
     }
 
-    if (showForm) {
-      if (true) {
-        setShowForm(false);
-      } else return;
-    }
     setLoading(true);
-    const contract = new ethers.Contract(contractAddress, ABI, provider);
+    const contract = new ethers.Contract(
+      contractAddress,
+      ABI,
+      isGetter ? provider : signer
+    );
     const argumentTypes = getArgumentTypes(func.inputs);
-    console.log(userInputs);
+    setUserInputs(
+      validateForm(
+        userInputs,
+        func.inputs.map((x) => x.type)
+      )
+    );
     await contract[func.name + `(${argumentTypes.toString()})`](
       ...userInputs
     ).then(
       (value) => {
         setResponse(formatResonse(value));
+        setShowForm(false);
       },
       (error) => {
         const errorJSON = JSON.stringify(error);
@@ -62,10 +75,21 @@ function FunctionButton({ func, ABI, contractAddress }) {
         console.log(parsedError);
 
         if (!toast.isActive("generic")) {
+          var addressArrayError = func.inputs
+            .map((x) => x.type)
+            .includes("address[]")
+            ? " || Argument type 'address[]' is not supported at the moment 😔 "
+            : "";
+
           toast({
             id: "generic",
             title: "Something Went Wrong",
-            description: `${parsedError.reason}`,
+            description:
+              `${
+                parsedError.reason === undefined
+                  ? parsedError.message
+                  : parsedError.reason
+              }` + addressArrayError,
             status: "warning",
             duration: 5000,
             position: "top",
@@ -95,7 +119,7 @@ function FunctionButton({ func, ABI, contractAddress }) {
         bg={useColorModeValue("gray.100", "gray.600")}
         shadow="base"
         marginBottom={3}
-        onClick={callGetterFunction}
+        onClick={func.inputs.length > 0 ? openOrCollapse : callGetterFunction}
       >
         <Text>{func.name}</Text>
         <HStack>

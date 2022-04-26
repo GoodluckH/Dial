@@ -28,6 +28,7 @@ function GetterFunctions({ functions, ABI, contractAddress }) {
             func={item}
             ABI={ABI}
             contractAddress={contractAddress}
+            isGetter={true}
           />
         );
       })}

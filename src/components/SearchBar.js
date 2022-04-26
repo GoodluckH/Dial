@@ -5,6 +5,7 @@ import {
   HStack,
   IconButton,
   FormControl,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useNetwork } from "@thirdweb-dev/react";
 import { SearchIcon } from "@chakra-ui/icons";
@@ -106,6 +107,7 @@ function SearchBar(props) {
             placeholder={placeholderText}
             value={address}
             onChange={handleInput}
+            color={useColorModeValue("black", "white")}
           />
           <IconButton
             aria-label="Fetch Contract Methods"
