@@ -7,6 +7,9 @@ import {
   useColorMode,
   useColorModeValue,
   Text,
+  Link,
+  Code,
+  Container,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import WalletInfo from "./WalletInfo";
@@ -38,14 +41,15 @@ export default function NavBar() {
             <Stack direction={"row"} spacing={7}>
               <Box />
               <Box>
-                <Text
+                <Code
                   fontSize="xl"
                   fontWeight="black"
+                  variant="solid"
                   bgGradient="linear(to-l, #7928CA, #FF0080)"
                   bgClip="text"
                 >
-                  call()
-                </Text>
+                  <Link href="/">call()</Link>
+                </Code>
               </Box>
             </Stack>
           </Flex>

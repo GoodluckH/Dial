@@ -15,6 +15,7 @@ import formatResonse from "../helpers/formatResponse";
 import TypeTags from "./TypeTags";
 import getArgumentTypes from "../helpers/getArgumentTypes";
 import validateForm from "../helpers/validateForm";
+import { wait } from "@testing-library/user-event/dist/utils";
 window.process = process;
 
 function FunctionButton({ func, ABI, contractAddress, isGetter }) {
@@ -62,42 +63,50 @@ function FunctionButton({ func, ABI, contractAddress, isGetter }) {
         func.inputs.map((x) => x.type)
       )
     );
-    await contract[func.name + `(${argumentTypes.toString()})`](
-      ...userInputs
-    ).then(
-      (value) => {
-        setResponse(formatResonse(value));
-        setShowForm(false);
-      },
-      (error) => {
-        const errorJSON = JSON.stringify(error);
-        const parsedError = JSON.parse(errorJSON);
-        console.log(parsedError);
 
-        if (!toast.isActive("generic")) {
-          var addressArrayError = func.inputs
-            .map((x) => x.type)
-            .includes("address[]")
-            ? " || Argument type 'address[]' is not supported at the moment 😔 "
-            : "";
+    if (!isGetter) {
+      const transaction = await contract[
+        func.name + `(${argumentTypes.toString()})`
+      ](...userInputs);
+      await wait(transaction).then((value) => console.log(value));
+    } else {
+      await contract[func.name + `(${argumentTypes.toString()})`](
+        ...userInputs
+      ).then(
+        (value) => {
+          setResponse(formatResonse(value));
+          setShowForm(false);
+        },
+        (error) => {
+          const errorJSON = JSON.stringify(error);
+          const parsedError = JSON.parse(errorJSON);
+          console.log(parsedError);
 
-          toast({
-            id: "generic",
-            title: "Something Went Wrong",
-            description:
-              `${
-                parsedError.reason === undefined
-                  ? parsedError.message
-                  : parsedError.reason
-              }` + addressArrayError,
-            status: "warning",
-            duration: 5000,
-            position: "top",
-            isClosable: true,
-          });
+          if (!toast.isActive("generic")) {
+            var addressArrayError = func.inputs
+              .map((x) => x.type)
+              .includes("address[]")
+              ? " || Argument type 'address[]' is not supported at the moment 😔 "
+              : "";
+
+            toast({
+              id: "generic",
+              title: "Something Went Wrong",
+              description:
+                `${
+                  parsedError.reason === undefined
+                    ? parsedError.message
+                    : parsedError.reason
+                }` + addressArrayError,
+              status: "warning",
+              duration: 5000,
+              position: "top",
+              isClosable: true,
+            });
+          }
         }
-      }
-    );
+      );
+    }
 
     setLoading(false);
   };

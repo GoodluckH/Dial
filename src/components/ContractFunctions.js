@@ -13,7 +13,9 @@ function ContractFunctions({ ABI, contractAddress }) {
     (item) => item.stateMutability === "view" || item.stateMutability === "pure"
   );
   var normalFunctions = functions.filter(
-    (item) => item.inputs.length !== 0 || !getterFunctions.includes(item)
+    (item) =>
+      (item.inputs.length !== 0 && !getterFunctions.includes(item)) ||
+      !getterFunctions.includes(item)
   );
 
   return (
