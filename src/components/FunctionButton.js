@@ -24,8 +24,10 @@ const pulse = keyframes`
 100% { background-color: #7928CA;}
 `;
 
-var provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
+if (window.ethereum) {
+  var provider = new ethers.providers.Web3Provider(window.ethereum);
+  var signer = provider.getSigner();
+}
 
 function FunctionButton({ func, ABI, contractAddress, isGetter }) {
   const toast = useToast();

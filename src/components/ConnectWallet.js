@@ -14,7 +14,7 @@ import {
 } from "@thirdweb-dev/react";
 import WalletButton from "./WalletButton";
 
-export const ConnectWallet = () => {
+export default function ConnectWallet() {
   const connectWithCoinbaseWallet = useCoinbaseWallet();
   const connectWithMetamask = useMetamask();
   const connectWithWalletConnect = useWalletConnect();
@@ -67,4 +67,4 @@ export const ConnectWallet = () => {
       </Box>
     </>
   );
-};
+}

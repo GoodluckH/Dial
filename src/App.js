@@ -6,13 +6,15 @@ import {
   Container,
   Box,
   Spacer,
+  Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { ConnectWallet } from "./components/ConnectWallet";
 import { useAddress } from "@thirdweb-dev/react";
 
 import NavBar from "./components/NavBar/NavBar";
 import SearchBar from "./components/SearchBar";
+import NoWalletExtension from "./components/NoWalletExtension";
+import ConnectWallet from "./components/ConnectWallet";
 import ContractFunctions from "./components/ContractFunctions";
 
 function App() {
@@ -32,7 +34,8 @@ function App() {
         minH="100vh"
         background={useColorModeValue("gray.100", "gray.700")}
       >
-        <ConnectWallet />
+        {window.ethereum && <ConnectWallet />}
+        {!window.ethereum && <NoWalletExtension />}
         <Container maxW="lg" h="vh" hidden={!address}>
           <Box
             maxW="lg"
