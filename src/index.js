@@ -1,4 +1,4 @@
-import { React, StrictMode } from "react";
+import { React } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
@@ -9,12 +9,10 @@ import Test from "./components/Test";
 const root = createRoot(document.getElementById("root"));
 
 root.render(
-  <StrictMode>
-    <ChakraProvider>
-      <ThirdwebProvider desiredChainId={ChainId.Mainnet}>
-        <App />
-        {/*  <Test /> */}
-      </ThirdwebProvider>
-    </ChakraProvider>
-  </StrictMode>
+  <ChakraProvider>
+    <ThirdwebProvider desiredChainId={ChainId.Mainnet}>
+      <App />
+      {/*  <Test /> */}
+    </ThirdwebProvider>
+  </ChakraProvider>
 );

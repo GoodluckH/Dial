@@ -8,6 +8,7 @@ import {
   Box,
   FormControl,
   Input,
+  keyframes,
 } from "@chakra-ui/react";
 import process from "process";
 import { ethers } from "ethers";
@@ -15,20 +16,27 @@ import formatResonse from "../helpers/formatResponse";
 import TypeTags from "./TypeTags";
 import getArgumentTypes from "../helpers/getArgumentTypes";
 import validateForm from "../helpers/validateForm";
-import { wait } from "@testing-library/user-event/dist/utils";
 window.process = process;
+
+const pulse = keyframes` 
+0% { background-color: #7928CA;}
+50% {background-color: #FF0080;}
+100% { background-color: #7928CA;}
+`;
+
+var provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
 
 function FunctionButton({ func, ABI, contractAddress, isGetter }) {
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
+
   const [response, setResponse] = useState([]);
+  const [mining, setMining] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [userInputs, setUserInputs] = useState(
     func.inputs.length === 0 ? [] : new Array(func.inputs.length)
   );
-
-  var provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
 
   const openOrCollapse = () => {
     if (response.length !== 0) {
@@ -65,10 +73,74 @@ function FunctionButton({ func, ABI, contractAddress, isGetter }) {
     );
 
     if (!isGetter) {
-      const transaction = await contract[
-        func.name + `(${argumentTypes.toString()})`
-      ](...userInputs);
-      await wait(transaction).then((value) => console.log(value));
+      var transaction;
+      await contract[func.name + `(${argumentTypes.toString()})`](...userInputs)
+        .then((result) => {
+          transaction = result;
+          setMining(true);
+        })
+        .catch((error) => {
+          setLoading(false);
+          const errorJSON = JSON.stringify(error);
+          const parsedError = JSON.parse(errorJSON);
+          if (!toast.isActive("contractCallFailure")) {
+            toast({
+              id: "contractCallFailure",
+              title: `${
+                parsedError.error === undefined
+                  ? `Unable to Execute Transaction`
+                  : `Execution Reverted`
+              }`,
+              description: `${
+                parsedError.error === undefined
+                  ? parsedError.message
+                  : parsedError.error.message
+              }`,
+              status: "error",
+              duration: 4000,
+              position: "top",
+              isClosable: true,
+            });
+          }
+        });
+      if (transaction) {
+        await provider
+          .waitForTransaction(transaction.hash)
+          .then((txn_test) => {
+            if (!toast.isActive("transactionSuccess")) {
+              toast({
+                id: "transactionSuccess",
+                title: "Transaction Mined!",
+                description: `Transaction hash: ${txn_test.transactionHash}`,
+                status: "success",
+                duration: 5000,
+                position: "top",
+                isClosable: true,
+              });
+            }
+            setMining(false);
+          })
+          .catch((error) => {
+            setMining(false);
+            const errorJSON = JSON.stringify(error);
+            const parsedError = JSON.parse(errorJSON);
+            if (!toast.isActive("transactionFailed")) {
+              toast({
+                id: "transactionFailed",
+                title: "Transaction didn't go through",
+                description: `${
+                  parsedError.reason === undefined
+                    ? parsedError.message
+                    : parsedError.reason
+                }`,
+                status: "error",
+                duration: 5000,
+                position: "top",
+                isClosable: true,
+              });
+            }
+          });
+      }
     } else {
       await contract[func.name + `(${argumentTypes.toString()})`](
         ...userInputs
@@ -80,7 +152,6 @@ function FunctionButton({ func, ABI, contractAddress, isGetter }) {
         (error) => {
           const errorJSON = JSON.stringify(error);
           const parsedError = JSON.parse(errorJSON);
-          console.log(parsedError);
 
           if (!toast.isActive("generic")) {
             var addressArrayError = func.inputs
@@ -98,7 +169,7 @@ function FunctionButton({ func, ABI, contractAddress, isGetter }) {
                     ? parsedError.message
                     : parsedError.reason
                 }` + addressArrayError,
-              status: "warning",
+              status: "error",
               duration: 5000,
               position: "top",
               isClosable: true,
@@ -110,15 +181,17 @@ function FunctionButton({ func, ABI, contractAddress, isGetter }) {
 
     setLoading(false);
   };
-
+  const pulseAnimation = `${pulse} infinite 2s linear`;
   return (
     <>
       <Button
-        justifyContent="space-between"
-        isLoading={loading}
+        justifyContent={mining ? `center` : `space-between`}
+        isLoading={loading && !mining}
+        pointerEvents={mining ? `none` : `default`}
         size="md"
         height="50px"
         width="100%"
+        animation={mining ? pulseAnimation : null}
         sx={
           (response.length === 0) ^ showForm
             ? { borderRadius: "10px" }
@@ -130,8 +203,10 @@ function FunctionButton({ func, ABI, contractAddress, isGetter }) {
         marginBottom={3}
         onClick={func.inputs.length > 0 ? openOrCollapse : callGetterFunction}
       >
-        <Text>{func.name}</Text>
-        <HStack>
+        <Text color={mining ? `white` : `default`}>
+          {mining ? `Mining Transaction` : func.name}
+        </Text>
+        <HStack hidden={mining}>
           {func.outputs.length !== 0 && <TypeTags outputs={func.outputs} />}
         </HStack>
       </Button>

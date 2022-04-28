@@ -23,7 +23,6 @@ function getEtherScanAPI(address, network) {
       address.length === 40 ? "0x" + address : address
     }&apikey=${process.env.REACT_APP_ETHERSCAN_API}`;
   }
-  console.log("switched to " + network[0].data.chain.id);
   return endpoint;
 }
 
@@ -36,7 +35,6 @@ function SearchBar(props) {
 
   const handleInput = (e) => {
     setAddress(e.target.value);
-    console.log(address);
   };
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -68,13 +66,11 @@ function SearchBar(props) {
               props.onGettingContractABI(contractABI, address);
             } else {
               //TODO: display unable to extract functions
-              console.log("Error");
             }
             setLoading(false);
             return true;
           },
           (error) => {
-            console.log("something went wrong: " + error);
             setLoading(false);
             return false;
           }

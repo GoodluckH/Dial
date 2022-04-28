@@ -36,6 +36,5 @@ export default function validateForm(userInputs, types) {
       ans.push(userInputs[i]);
     }
   }
-  console.log(ans);
   return ans;
 }

@@ -4,9 +4,7 @@ function formatResonse() {
   var response = [];
   for (var i = 0; i < arguments.length; i++) {
     const value = arguments[i];
-    // console.log(convert(value));
     response.push(convert(value));
-    console.log(`${value.constructor.name}: ${convert(value)}`);
   }
   return response;
 }
