@@ -1,4 +1,4 @@
-import { Code, Link } from "@chakra-ui/react";
+import { Code } from "@chakra-ui/react";
 export default function Test() {
   return (
     <Code

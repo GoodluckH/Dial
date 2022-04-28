@@ -1,5 +1,4 @@
 import BigNumber from "bignumber.js";
-import { ethers } from "ethers";
 export default function validateForm(userInputs, types) {
   var ans = [];
   for (var i = 0; i < userInputs.length; i++) {

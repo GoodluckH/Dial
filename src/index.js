@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
-import Test from "./components/Test";
 
 const root = createRoot(document.getElementById("root"));
 

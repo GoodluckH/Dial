@@ -7,7 +7,6 @@ import {
   Box,
   Spacer,
   useColorModeValue,
-  Text,
 } from "@chakra-ui/react";
 import { ConnectWallet } from "./components/ConnectWallet";
 import { useAddress } from "@thirdweb-dev/react";

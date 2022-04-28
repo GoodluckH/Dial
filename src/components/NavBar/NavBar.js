@@ -6,10 +6,8 @@ import {
   Button,
   useColorMode,
   useColorModeValue,
-  Text,
   Link,
   Code,
-  Container,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import WalletInfo from "./WalletInfo";
